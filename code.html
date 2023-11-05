@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste</title>
+</head>
+<body>
+    <div style="display: flex; justify-content: center; align-items: center; margin: auto; height: 100vh;">
+        <canvas width="1000" height="700" style="border:solid 1px black" id="myCanvas"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("myCanvas");
+        const ctx = canvas.getContext("2d");
+        const W = canvas.width; const H = canvas.height;
+
+        const bg = new Image();
+        bg.src = '/images/fundo.svg';
+
+        const cauldron = new Image();
+        cauldron.src = '/images/cauldron.svg';
+
+        const redPotion = new Image();
+        redPotion.src = 'images/redPotion.svg';
+
+        const yellowPotion = new Image();
+        yellowPotion.src = 'images/yellowPotion.svg';
+
+        const bluePotion = new Image();
+        bluePotion.src = 'images/bluePotion.svg';
+
+        
+        window.onload = function() {
+            ctx.drawImage(bg, 0, 0);
+            ctx.drawImage(cauldron, 200, 300, cauldron.width * 2.5, cauldron.height * 2.5);
+            ctx.drawImage(redPotion, 670, 150, redPotion.width * 0.75, redPotion.height * 0.75);
+            ctx.drawImage(yellowPotion, 770, 150, yellowPotion.width * 0.75, yellowPotion.height * 0.75);
+            ctx.drawImage(bluePotion, 870, 150, bluePotion.width * 0.75, bluePotion.height * 0.75);
+        }
+        
+
+    </script>
+</body>
+</html>
