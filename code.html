@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,15 +12,21 @@
         }
     </style>
 </head>
+
 <body>
+
     <div style="display: flex; justify-content: center; align-items: center; margin: auto; height: 100vh;">
         <canvas width="1000" height="700" style="border:solid 1px black" id="myCanvas"></canvas>
     </div>
-
+    <div style="justify-content: left; margin: auto; height: 10px;">
+        <button onclick="reset()">Reset</button>
+    </div>
     <script>
         const canvas = document.getElementById("myCanvas");
         const ctx = canvas.getContext("2d");
-        const W = canvas.width; const H = canvas.height;
+        const W = canvas.width;
+        const H = canvas.height;
+
 
         const bg = new Image();
         bg.src = '/images/fundo.svg';
@@ -36,21 +43,24 @@
         const bluePotion = new Image();
         bluePotion.src = 'images/bluePotion.svg';
 
-        const potions = [
+        let potions = [
             { image: redPotion, x: 670, y: 150, width: redPotion.width * 0.75, height: redPotion.height * 0.75 },
             { image: yellowPotion, x: 770, y: 150, width: yellowPotion.width * 0.75, height: yellowPotion.height * 0.75 },
             { image: bluePotion, x: 870, y: 150, width: bluePotion.width * 0.75, height: bluePotion.height * 0.75 }
         ];
 
+
         let selectedPotion = null;
         let offsetX, offsetY;
 
         function draw() {
+            // initial()
             ctx.clearRect(0, 0, W, H);
             ctx.drawImage(bg, 0, 0);
             ctx.drawImage(cauldron, 200, 300, cauldron.width * 2.5, cauldron.height * 2.5);
             potions.forEach(potion => {
                 ctx.drawImage(potion.image, potion.x, potion.y, potion.width, potion.height);
+                console.log(potion.x)
             });
         }
 
@@ -102,20 +112,42 @@
                     if (selectedPotion.image == bluePotion) {
                         selectedPotion.image.src = '/images/bluePotionCollide.svg';
                     }
+                } else {
+                    if (selectedPotion.image == redPotion) {
+                        selectedPotion.image.src = '/images/redPotion.svg';
+                    }
+                    if (selectedPotion.image == yellowPotion) {
+                        selectedPotion.image.src = '/images/yellowPotion.svg';
+                    }
+                    if (selectedPotion.image == bluePotion) {
+                        selectedPotion.image.src = '/images/bluePotion.svg';
+                    }
                 }
-
                 draw();
             }
         });
-
+        function reset() {
+            //ctx.reset()
+            potions = [
+                { image: redPotion, x: 670, y: 150, width: redPotion.width * 0.75, height: redPotion.height * 0.75 },
+                { image: yellowPotion, x: 770, y: 150, width: yellowPotion.width * 0.75, height: yellowPotion.height * 0.75 },
+                { image: bluePotion, x: 870, y: 150, width: bluePotion.width * 0.75, height: bluePotion.height * 0.75 }
+            ];
+            cauldron.src = '/images/cauldron.svg';
+            redPotion.src = 'images/redPotion.svg';
+            yellowPotion.src = 'images/yellowPotion.svg';
+            bluePotion.src = 'images/bluePotion.svg';
+            draw()
+        }
         canvas.addEventListener('mouseup', () => {
             selectedPotion = null;
         });
 
-        window.onload = function() {
+        window.onload = function () {
             draw();
         };
 
     </script>
 </body>
+
 </html>
