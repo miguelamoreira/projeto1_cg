@@ -49,7 +49,6 @@
             { image: bluePotion, x: 870, y: 150, width: bluePotion.width * 0.75, height: bluePotion.height * 0.75 }
         ];
 
-
         let selectedPotion = null;
         let offsetX, offsetY;
 
@@ -60,7 +59,6 @@
             ctx.drawImage(cauldron, 200, 300, cauldron.width * 2.5, cauldron.height * 2.5);
             potions.forEach(potion => {
                 ctx.drawImage(potion.image, potion.x, potion.y, potion.width, potion.height);
-                console.log(potion.x)
             });
         }
 
@@ -83,6 +81,19 @@
             });
         });
 
+        canvas.addEventListener('mousedown', (e) => {
+            const pos = {
+                x: e.clientX - canvas.offsetLeft,
+                y: e.clientY - canvas.offsetTop
+            };
+
+            potions.forEach(potion => {
+                if (isInside(pos, potion)) {
+                    document.body.style.cursor = 'pointer';
+                }
+            });
+        });
+
         function checkCollision(potion, cauldron) {
             return (
                 potion.x < cauldron.x + cauldron.width &&
@@ -94,6 +105,8 @@
 
         canvas.addEventListener('mousemove', (e) => {
             if (selectedPotion !== null) {
+                document.body.style.cursor = 'pointer';
+
                 const pos = {
                     x: e.clientX - canvas.offsetLeft,
                     y: e.clientY - canvas.offsetTop
@@ -126,22 +139,25 @@
                 draw();
             }
         });
+
+        canvas.addEventListener('mouseup', () => {
+            selectedPotion = null;
+            document.body.style.cursor = 'default';
+        });
+
         function reset() {
-            //ctx.reset()
+            ctx.reset()
+            cauldron.src = '/images/cauldron.svg';
+            redPotion.src = 'images/redPotion.svg';
+            yellowPotion.src = 'images/yellowPotion.svg';
+            bluePotion.src = 'images/bluePotion.svg';
             potions = [
                 { image: redPotion, x: 670, y: 150, width: redPotion.width * 0.75, height: redPotion.height * 0.75 },
                 { image: yellowPotion, x: 770, y: 150, width: yellowPotion.width * 0.75, height: yellowPotion.height * 0.75 },
                 { image: bluePotion, x: 870, y: 150, width: bluePotion.width * 0.75, height: bluePotion.height * 0.75 }
             ];
-            cauldron.src = '/images/cauldron.svg';
-            redPotion.src = 'images/redPotion.svg';
-            yellowPotion.src = 'images/yellowPotion.svg';
-            bluePotion.src = 'images/bluePotion.svg';
             draw()
         }
-        canvas.addEventListener('mouseup', () => {
-            selectedPotion = null;
-        });
 
         window.onload = function () {
             draw();
