@@ -12,9 +12,6 @@
     <div style="display: flex; justify-content: center; align-items: center; margin: auto; height: 95vh;">
         <canvas width="1000" height="700" style="border:solid 1px black" id="myCanvas"></canvas>
     </div>
-    <div style="justify-content: left; margin: auto; height: 10px;">
-        <button onclick="reset()">Reset</button>
-    </div>
     <script>
         const canvas = document.getElementById("myCanvas");
         const ctx = canvas.getContext("2d");
@@ -40,6 +37,9 @@
         const overlay = new Image();
         overlay.src = '/images/vignette.svg';
 
+        const btnReset = new Image();
+        btnReset.src = '/images/reset.svg';
+
         let potions = [
             { image: redPotion, x: 670, y: 150, width: redPotion.width * 0.75, height: redPotion.height * 0.75 },
             { image: yellowPotion, x: 770, y: 150, width: yellowPotion.width * 0.75, height: yellowPotion.height * 0.75 },
@@ -57,6 +57,7 @@
                 ctx.drawImage(potion.image, potion.x, potion.y, potion.width, potion.height);
             });
             ctx.drawImage(overlay, 0, 0)
+            ctx.drawImage(btnReset, 930, 20, btnReset.width*0.35, btnReset.height*0.35)
         }
 
         function isInside(pos, rect) {
@@ -78,6 +79,17 @@
             });
         });
 
+        canvas.addEventListener('click', (e) => {
+            const pos = {
+                x: e.clientX - canvas.offsetLeft,
+                y: e.clientY - canvas.offsetTop
+            };
+
+            if (isInside(pos, {x: 930, y: 20, width: btnReset.width * 0.35, height: btnReset.height*0.35})) {
+                reset()
+            }
+        })
+
         function checkCollision(potion, cauldron) {
             return (
                 potion.x < cauldron.x + cauldron.width &&
@@ -93,16 +105,21 @@
                 y: e.clientY - canvas.offsetTop
             };
 
-            let isPotion = false;
+            let isClickable = false;
 
             potions.forEach(potion => {
                 if (isInside(pos, potion)) {
                     document.body.style.cursor = 'pointer';
-                    isPotion = true;
+                    isClickable = true;
                 }
             });
 
-            if (!isPotion) {
+            if (isInside(pos, {x: 930, y: 20, width: btnReset.width * 0.35, height: btnReset.height*0.35})) {
+                document.body.style.cursor = 'pointer';
+                isClickable = true;
+            }
+
+            if (!isClickable) {
                 document.body.style.cursor = 'default';
             }
 
