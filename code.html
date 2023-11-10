@@ -37,6 +37,9 @@
         const bluePotion = new Image();
         bluePotion.src = 'images/bluePotion.svg';
 
+        const overlay = new Image();
+        overlay.src = '/images/vignette.svg';
+
         let potions = [
             { image: redPotion, x: 670, y: 150, width: redPotion.width * 0.75, height: redPotion.height * 0.75 },
             { image: yellowPotion, x: 770, y: 150, width: yellowPotion.width * 0.75, height: yellowPotion.height * 0.75 },
@@ -53,6 +56,7 @@
             potions.forEach(potion => {
                 ctx.drawImage(potion.image, potion.x, potion.y, potion.width, potion.height);
             });
+            ctx.drawImage(overlay, 0, 0)
         }
 
         function isInside(pos, rect) {
