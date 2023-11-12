@@ -26,13 +26,22 @@
         cauldron.src = '/images/cauldron.svg';
 
         const redPotion = new Image();
-        redPotion.src = 'images/redPotion.svg';
+        redPotion.src = 'images/PotionRed1.svg';
 
         const yellowPotion = new Image();
-        yellowPotion.src = 'images/yellowPotion.svg';
+        yellowPotion.src = 'images/PotionYellow1.svg';
 
         const bluePotion = new Image();
-        bluePotion.src = 'images/bluePotion.svg';
+        bluePotion.src = 'images/PotionBlue1.svg';
+
+        const potion1 = new Image();
+        potion1.src = 'images/Potion1.svg';
+
+        const potion2 = new Image();
+        potion2.src = 'images/Potion1.svg';
+
+        const potion3 = new Image();
+        potion3.src = 'images/Potion1.svg';
 
         const overlay = new Image();
         overlay.src = '/images/vignette.svg';
@@ -41,9 +50,12 @@
         btnReset.src = '/images/reset.svg';
 
         let potions = [
-            { image: redPotion, x: 670, y: 150, width: redPotion.width * 0.75, height: redPotion.height * 0.75 },
-            { image: yellowPotion, x: 770, y: 150, width: yellowPotion.width * 0.75, height: yellowPotion.height * 0.75 },
-            { image: bluePotion, x: 870, y: 150, width: bluePotion.width * 0.75, height: bluePotion.height * 0.75 }
+            { image: redPotion, x: 670, y: 160, width: redPotion.width, height: redPotion.height },
+            { image: yellowPotion, x: 770, y: 160, width: yellowPotion.width, height: yellowPotion.height },
+            { image: bluePotion, x: 870, y: 160, width: bluePotion.width, height: bluePotion.height },
+            { image: potion1, x: 670, y: 310, width: potion1.width, height: potion1.height },
+            { image: potion2, x: 770, y: 310, width: potion2.width, height: potion2.height },
+            { image: potion3, x: 870, y: 310, width: potion3.width, height: potion3.height }
         ];
 
         let selectedPotion = null;
@@ -57,7 +69,7 @@
                 ctx.drawImage(potion.image, potion.x, potion.y, potion.width, potion.height);
             });
             ctx.drawImage(overlay, 0, 0)
-            ctx.drawImage(btnReset, 930, 20, btnReset.width*0.35, btnReset.height*0.35)
+            ctx.drawImage(btnReset, 930, 20, btnReset.width * 0.35, btnReset.height * 0.35)
         }
 
         function isInside(pos, rect) {
@@ -77,6 +89,8 @@
                     offsetY = pos.y - potion.y;
                 }
             });
+            
+            console.log("mousedown")
         });
 
         canvas.addEventListener('click', (e) => {
@@ -85,9 +99,10 @@
                 y: e.clientY - canvas.offsetTop
             };
 
-            if (isInside(pos, {x: 930, y: 20, width: btnReset.width * 0.35, height: btnReset.height*0.35})) {
+            if (isInside(pos, { x: 930, y: 20, width: btnReset.width * 0.35, height: btnReset.height * 0.35 })) {
                 reset()
             }
+            console.log("click")
         })
 
         function checkCollision(potion, cauldron) {
@@ -114,7 +129,7 @@
                 }
             });
 
-            if (isInside(pos, {x: 930, y: 20, width: btnReset.width * 0.35, height: btnReset.height*0.35})) {
+            if (isInside(pos, { x: 930, y: 20, width: btnReset.width * 0.35, height: btnReset.height * 0.35 })) {
                 document.body.style.cursor = 'pointer';
                 isClickable = true;
             }
@@ -126,32 +141,51 @@
             if (selectedPotion !== null) {
                 document.body.style.cursor = 'pointer';
 
-            selectedPotion.x = pos.x - offsetX;
-            selectedPotion.y = pos.y - offsetY;
+                selectedPotion.x = pos.x - offsetX;
+                selectedPotion.y = pos.y - offsetY;
 
-            if (checkCollision(selectedPotion, { x: 200, y: 300, width: cauldron.width * 2.5, height: 25 })) {
-                if (selectedPotion.image == redPotion) {
-                    selectedPotion.image.src = '/images/redPotionCollide.svg';
-                }
-                if (selectedPotion.image == yellowPotion) {
-                    selectedPotion.image.src = '/images/yellowPotionCollide.svg';
-                }
-                if (selectedPotion.image == bluePotion) {
-                    selectedPotion.image.src = '/images/bluePotionCollide.svg';
-                }
-            } else {
-                if (selectedPotion.image == redPotion) {
-                    selectedPotion.image.src = '/images/redPotion.svg';
-                }
-                if (selectedPotion.image == yellowPotion) {
-                    selectedPotion.image.src = '/images/yellowPotion.svg';
-                }
-                if (selectedPotion.image == bluePotion) {
-                    selectedPotion.image.src = '/images/bluePotion.svg';
-                }
-            }
 
-            draw();
+                if (checkCollision(selectedPotion, { x: 200, y: 300, width: cauldron.width * 2.5, height: 25 })) {
+                    if (selectedPotion.image == redPotion) {
+                        selectedPotion.image.src = '/images/PotionRedCollide.svg';
+                    }
+                    if (selectedPotion.image == yellowPotion) {
+                        selectedPotion.image.src = '/images/PotionYellowCollide.svg';
+                    }
+                    if (selectedPotion.image == bluePotion) {
+                        selectedPotion.image.src = '/images/PotionBlueCollide.svg';
+                    }
+                    if (selectedPotion.image == potion1) {
+                        selectedPotion.image.src = '/images/PotionCollide.svg';
+                    }
+                    if (selectedPotion.image == potion2) {
+                        selectedPotion.image.src = '/images/PotionCollide.svg';
+                    }
+                    if (selectedPotion.image == potion3) {
+                        selectedPotion.image.src = '/images/PotionCollide.svg';
+                    }
+                } else {
+                    if (selectedPotion.image == redPotion) {
+                        selectedPotion.image.src = '/images/PotionRed1.svg';
+                    }
+                    if (selectedPotion.image == yellowPotion) {
+                        selectedPotion.image.src = '/images/PotionYellow1.svg';
+                    }
+                    if (selectedPotion.image == bluePotion) {
+                        selectedPotion.image.src = '/images/PotionBlue1.svg';
+                    }
+                    if (selectedPotion.image == potion1) {
+                        selectedPotion.image.src = '/images/Potion1.svg';
+                    }
+                    if (selectedPotion.image == potion2) {
+                        selectedPotion.image.src = '/images/Potion1.svg';
+                    }
+                    if (selectedPotion.image == potion3) {
+                        selectedPotion.image.src = '/images/Potion1.svg';
+                    }
+                }
+
+                draw();
 
             }
         });
@@ -163,13 +197,21 @@
         function reset() {
             ctx.reset()
             cauldron.src = '/images/cauldron.svg';
-            redPotion.src = 'images/redPotion.svg';
-            yellowPotion.src = 'images/yellowPotion.svg';
-            bluePotion.src = 'images/bluePotion.svg';
+            redPotion.src = 'images/PotionRed1.svg';
+            yellowPotion.src = 'images/PotionYellow1.svg';
+            bluePotion.src = 'images/PotionBlue1.svg';
+            potion1.src = 'images/Potion1.svg';
+            potion2.src = 'images/Potion1.svg';
+            potion3.src = 'images/Potion1.svg';
+
             potions = [
-                { image: redPotion, x: 670, y: 150, width: redPotion.width * 0.75, height: redPotion.height * 0.75 },
-                { image: yellowPotion, x: 770, y: 150, width: yellowPotion.width * 0.75, height: yellowPotion.height * 0.75 },
-                { image: bluePotion, x: 870, y: 150, width: bluePotion.width * 0.75, height: bluePotion.height * 0.75 }
+                { image: redPotion, x: 670, y: 160, width: redPotion.width, height: redPotion.height },
+                { image: yellowPotion, x: 770, y: 160, width: yellowPotion.width, height: yellowPotion.height },
+                { image: bluePotion, x: 870, y: 160, width: bluePotion.width, height: bluePotion.height },
+                { image: potion1, x: 670, y: 310, width: potion1.width, height: potion1.height },
+                { image: potion2, x: 770, y: 310, width: potion2.width, height: potion2.height },
+                { image: potion3, x: 870, y: 310, width: potion3.width, height: potion3.height }
+
             ];
             draw()
         }
