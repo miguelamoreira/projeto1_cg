@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Change Image Based on Mouse Movement</title>
+  <style>
+    canvas {
+      border: 1px solid #000;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="imageCanvas" width="800" height="400"></canvas>
+
+  <script>
+    var canvas = document.getElementById("imageCanvas");
+    var ctx = canvas.getContext("2d");
+
+    var images = [
+      "/images/PotionRed1.svg",
+      "/images/PotionRed2.svg",
+      // Add more image paths as needed
+    ];
+
+    var currentImageIndex = 0;
+
+    function drawImage(x, y) {
+      var img = new Image();
+      img.src = images[currentImageIndex];
+
+      img.onload = function() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, x, y, img.width, img.height);
+      };
+    }
+
+    function updateImageBasedOnMouseMovement(event) {
+      // Obtém a posição do mouse em relação ao canvas
+      var rect = canvas.getBoundingClientRect();
+      var mouseX = event.clientX - rect.left;
+      var mouseY = event.clientY - rect.top;
+
+      // Troca de imagem com base na posição Y do mouse
+      if (mouseY > canvas.height / 2) {
+        currentImageIndex = 1;
+      } else {
+        currentImageIndex = 0;
+      }
+    }
+
+    function handleMouseMove(event) {
+      updateImageBasedOnMouseMovement(event);
+      animate(event);
+    }
+
+    function animate(event) {
+      // Desenha a imagem com base na posição atual do mouse
+      drawImage(event.clientX, event.clientY);
+    }
+
+    // Adiciona o ouvinte de eventos fora da função animate
+    canvas.addEventListener("mousemove", handleMouseMove);
+  </script>
+</body>
+</html>

@@ -8,16 +8,17 @@
 </head>
 
 <body>
-
+    <!-- desenha o canvas -->
     <div style="display: flex; justify-content: center; align-items: center; margin: auto; height: 95vh;">
         <canvas width="1000" height="700" style="border:solid 1px black" id="myCanvas"></canvas>
     </div>
+
     <script>
-        const canvas = document.getElementById("myCanvas");
-        const ctx = canvas.getContext("2d");
+        //Const
+        const canvas = document.getElementById(`myCanvas`);
+        const ctx = canvas.getContext(`2d`);
         const W = canvas.width;
         const H = canvas.height;
-
 
         const bg = new Image();
         bg.src = '/images/fundo.svg';
@@ -49,6 +50,7 @@
         const btnReset = new Image();
         btnReset.src = '/images/reset.svg';
 
+        //POSIÇÕES DAS IMAGENS
         let potions = [
             { image: redPotion, x: 670, y: 160, width: redPotion.width, height: redPotion.height },
             { image: yellowPotion, x: 770, y: 160, width: yellowPotion.width, height: yellowPotion.height },
@@ -61,6 +63,8 @@
         let selectedPotion = null;
         let offsetX, offsetY;
 
+
+        //FUNÇÃO PARA DESENHAR
         function draw() {
             ctx.clearRect(0, 0, W, H);
             ctx.drawImage(bg, 0, 0);
@@ -72,27 +76,12 @@
             ctx.drawImage(btnReset, 930, 20, btnReset.width * 0.35, btnReset.height * 0.35)
         }
 
+        //INSIDE
         function isInside(pos, rect) {
             return pos.x > rect.x && pos.x < rect.x + rect.width && pos.y < rect.y + rect.height && pos.y > rect.y;
         }
 
-        canvas.addEventListener('mousedown', (e) => {
-            const pos = {
-                x: e.clientX - canvas.offsetLeft,
-                y: e.clientY - canvas.offsetTop
-            };
-
-            potions.forEach(potion => {
-                if (isInside(pos, potion)) {
-                    selectedPotion = potion;
-                    offsetX = pos.x - potion.x;
-                    offsetY = pos.y - potion.y;
-                }
-            });
-            
-            console.log("mousedown")
-        });
-
+        //RESET
         canvas.addEventListener('click', (e) => {
             const pos = {
                 x: e.clientX - canvas.offsetLeft,
@@ -102,9 +91,9 @@
             if (isInside(pos, { x: 930, y: 20, width: btnReset.width * 0.35, height: btnReset.height * 0.35 })) {
                 reset()
             }
-            console.log("click")
         })
 
+        //VERIFICA COLIÇÃO
         function checkCollision(potion, cauldron) {
             return (
                 potion.x < cauldron.x + cauldron.width &&
@@ -114,6 +103,8 @@
             );
         }
 
+
+        //MOUSE MOVE
         canvas.addEventListener('mousemove', (e) => {
             const pos = {
                 x: e.clientX - canvas.offsetLeft,
@@ -125,6 +116,7 @@
             potions.forEach(potion => {
                 if (isInside(pos, potion)) {
                     document.body.style.cursor = 'pointer';
+
                     isClickable = true;
                 }
             });
@@ -164,25 +156,29 @@
                     if (selectedPotion.image == potion3) {
                         selectedPotion.image.src = '/images/PotionCollide.svg';
                     }
+                    selectedPotion.width = selectedPotion.image.width * 1;
+                    selectedPotion.height = selectedPotion.image.height * 1;
                 } else {
                     if (selectedPotion.image == redPotion) {
-                        selectedPotion.image.src = '/images/PotionRed1.svg';
+                        selectedPotion.image.src = '/images/PotionRed2.svg';
                     }
                     if (selectedPotion.image == yellowPotion) {
-                        selectedPotion.image.src = '/images/PotionYellow1.svg';
+                        selectedPotion.image.src = '/images/PotionYellow2.svg';
                     }
                     if (selectedPotion.image == bluePotion) {
-                        selectedPotion.image.src = '/images/PotionBlue1.svg';
+                        selectedPotion.image.src = '/images/PotionBlue2.svg';
                     }
                     if (selectedPotion.image == potion1) {
-                        selectedPotion.image.src = '/images/Potion1.svg';
+                        selectedPotion.image.src = '/images/Potion2.svg';
                     }
                     if (selectedPotion.image == potion2) {
-                        selectedPotion.image.src = '/images/Potion1.svg';
+                        selectedPotion.image.src = '/images/Potion2.svg';
                     }
                     if (selectedPotion.image == potion3) {
-                        selectedPotion.image.src = '/images/Potion1.svg';
+                        selectedPotion.image.src = '/images/Potion2.svg';
                     }
+                    selectedPotion.width = selectedPotion.image.width;
+                    selectedPotion.height = selectedPotion.image.height;
                 }
 
                 draw();
@@ -190,10 +186,31 @@
             }
         });
 
-        canvas.addEventListener('mouseup', (e) => {
-            selectedPotion = null;
+
+        //MOUSE DOWN
+        canvas.addEventListener('mousedown', (e) => {
+            const pos = {
+                x: e.clientX - canvas.offsetLeft,
+                y: e.clientY - canvas.offsetTop
+            };
+
+            potions.forEach(potion => {
+                if (isInside(pos, potion)) {
+                    selectedPotion = potion;
+                    offsetX = pos.x - potion.x;
+                    offsetY = pos.y - potion.y;
+                }
+            });
+
         });
 
+        //MOUSE UP
+        canvas.addEventListener('mouseup', (e) => {
+            selectedPotion = null;
+            console.log("solta")
+        });
+
+        //RESET
         function reset() {
             ctx.reset()
             cauldron.src = '/images/cauldron.svg';
@@ -216,11 +233,13 @@
             draw()
         }
 
+        //INICIALIZAÇÃO
         window.onload = function () {
             draw();
         };
-
     </script>
+
+
 </body>
 
 </html>
