@@ -24,6 +24,8 @@
     ];
 
     var currentImageIndex = 0;
+    var isDragging = false;
+    var dragStartX, dragStartY;
 
     function drawImage(x, y) {
       var img = new Image();
@@ -35,32 +37,87 @@
       };
     }
 
-    function updateImageBasedOnMouseMovement(event) {
-      // Obtém a posição do mouse em relação ao canvas
-      var rect = canvas.getBoundingClientRect();
-      var mouseX = event.clientX - rect.left;
-      var mouseY = event.clientY - rect.top;
-
+    function updateImageBasedOnMousePosition(x, y) {
       // Troca de imagem com base na posição Y do mouse
-      if (mouseY > canvas.height / 2) {
+      if (y > canvas.height / 2) {
         currentImageIndex = 1;
       } else {
         currentImageIndex = 0;
       }
     }
 
+    function handleMouseDown(event) {
+      var rect = canvas.getBoundingClientRect();
+      var mouseX = event.clientX - rect.left;
+      var mouseY = event.clientY - rect.top;
+
+      // Verifica se o clique ocorreu dentro da área da imagem
+      if (
+        mouseX >= event.clientX &&
+        mouseX <= event.clientX + images[currentImageIndex].width &&
+        mouseY >= event.clientY &&
+        mouseY <= event.clientY + images[currentImageIndex].height
+      ) {
+        isDragging = true;
+        dragStartX = mouseX;
+        dragStartY = mouseY;
+      }
+    }
+
+    function handleMouseUp(event) {
+      isDragging = false;
+    }
+
     function handleMouseMove(event) {
-      updateImageBasedOnMouseMovement(event);
-      animate(event);
+      if (isDragging) {
+        var offsetX = event.clientX - dragStartX;
+        var offsetY = event.clientY - dragStartY;
+
+        // Atualiza a posição inicial para a nova posição do mouse
+        dragStartX = event.clientX;
+        dragStartY = event.clientY;
+
+        // Desenha a imagem com base na posição atualizada
+        drawImage(event.clientX - offsetX, event.clientY - offsetY);
+      }
     }
 
-    function animate(event) {
-      // Desenha a imagem com base na posição atual do mouse
-      drawImage(event.clientX, event.clientY);
+    function handleDragStart(event) {
+      event.preventDefault();
     }
 
-    // Adiciona o ouvinte de eventos fora da função animate
+    function handleDrop(event) {
+      event.preventDefault();
+      isDragging = false;
+
+      // Get the dropped file
+      var file = event.dataTransfer.files[0];
+
+      // Create a FileReader to read the file
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        // Set the dropped image as the current image
+        images[currentImageIndex] = e.target.result;
+        // Draw the image at the drop position
+        drawImage(event.clientX, event.clientY);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Adiciona os ouvintes de eventos
+    canvas.addEventListener("mousedown", handleMouseDown);
+    canvas.addEventListener("mouseup", handleMouseUp);
     canvas.addEventListener("mousemove", handleMouseMove);
+    canvas.addEventListener("dragstart", handleDragStart);
+    canvas.addEventListener("drop", handleDrop);
+
+    // Previne o comportamento padrão de arrastar e soltar do navegador
+    canvas.addEventListener("dragover", function (e) {
+      e.preventDefault();
+    });
+
+    // Inicializa a imagem ao carregar a página
+    drawImage(0, 0);
   </script>
 </body>
 </html>
