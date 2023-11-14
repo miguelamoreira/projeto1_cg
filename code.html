@@ -174,8 +174,19 @@
 
         //MOUSE UP
         canvas.addEventListener('mouseup', (e) => {
+
+            //voltar poção para a parteleira
+            potions = [
+                { image: redPotion, x: 660, y: 165, width: 92.65, height: redPotion.height, frame: 0 },
+                { image: yellowPotion, x: 760, y: 165, width: 92.65, height: yellowPotion.height, frame: 0 },
+                { image: bluePotion, x: 860, y: 165, width: 92.65, height: bluePotion.height, frame: 0 },
+                { image: potion1, x: 660, y: 315, width: 92.65, height: potion1.height, frame: 0 },
+                { image: potion2, x: 760, y: 315, width: 92.65, height: potion2.height, frame: 0 },
+                { image: potion3, x: 860, y: 315, width: 92.65, height: potion3.height, frame: 0 }
+
+            ];
+            draw()
             selectedPotion = null;
-            console.log("solta")
         });
 
         //RESET
