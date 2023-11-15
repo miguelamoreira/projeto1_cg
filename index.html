@@ -45,17 +45,54 @@
         const nameGame = new Image();
         nameGame.src = '/images/Inicial/ColorMix.svg';
 
+        // Variáveis para a animação da chama
+        let flameOpacity = 1; // Opacidade inicial
+        let animationStartTime; // Tempo de início da animação
 
-        //desenha no canvas
+        // Função de transição suave
+        function easeInOutQuad(t) {
+            return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+        }
+
+        // Desenha no canvas
         function draw() {
             ctx.clearRect(0, 0, W, H);
             ctx.drawImage(bg, 0, 0);
-            ctx.drawImage(broom, 8.4, 104.24)
+            ctx.drawImage(broom, 8.4, 104.24);
             ctx.drawImage(candles, 548.3, 473)
+
+            // Configura a opacidade da chama usando a função de transição suave
+            const easedOpacity = easeInOutQuad(flameOpacity);
+            ctx.globalAlpha = easedOpacity;
             ctx.drawImage(flame, 552.9, 473.4)
-            ctx.drawImage(nameGame, 244, 86)
-            ctx.drawImage(start, 285, 305)
-            ctx.drawImage(witch, 786, 278)
+            ctx.globalAlpha = 1; // Restaura a opacidade global
+
+            ctx.drawImage(nameGame, 244, 86);
+            ctx.drawImage(start, 284, 348);
+            ctx.drawImage(witch, 786, 278);
+        }
+
+        // Função para animar a transparência da chama
+        function animateTransparency(timestamp) {
+            if (!animationStartTime) {
+                animationStartTime = timestamp;
+            }
+
+            const elapsed = timestamp - animationStartTime;
+            const progress = Math.min(elapsed / 2000, 1); // Duração da animação em milissegundos
+
+            // Aplica a função de transição à opacidade
+            flameOpacity = progress;
+
+            draw();
+
+            if (progress < 1) {
+                requestAnimationFrame(animateTransparency);
+            } else {
+                // Reinicia para o estado original após 2 segundos
+                flameOpacity = 1;
+                animationStartTime = null;
+            }
         }
 
 
@@ -72,7 +109,7 @@
 
 
             //pointer no start
-            if (isInside(pos, { x: 285, y: 305, width: start.width, height: start.height })) {
+            if (isInside(pos, { x: 284, y: 348, width: start.width, height: start.height })) {
                 document.body.style.cursor = 'pointer';
                 start.src = '/images/Inicial/startGame2.svg';
                 draw();
@@ -88,7 +125,7 @@
                 document.body.style.cursor = 'pointer';
                 isClickable = true;
             }
-            
+
             if (!isClickable) {
                 start.src = '/images/Inicial/startGame1.svg';
                 draw();
@@ -107,6 +144,8 @@
             }
             //clique vela
             if (isInside(pos, { x: 548.3, y: 473.4, width: candles.width, height: candles.height })) {
+                animationStartTime = null; // Resetar o tempo de início
+                requestAnimationFrame(animateTransparency);
                 console.log("vela")
             }
             //clique vassoura
