@@ -49,6 +49,11 @@
         let flameOpacity = 1; // Opacidade inicial
         let animationStartTime; // Tempo de início da animação
 
+        // Variáveis para a animação da vassoura
+        let broomX = 8.4; // Posição inicial da vassoura
+        let broomDirection = 1; // Direção inicial da animação (1 para direita, -1 para esquerda)
+        let broomAnimationTimeout; // Referência para o timeout da animação da vassoura
+
         // Função de transição suave
         function easeInOutQuad(t) {
             return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
@@ -58,7 +63,7 @@
         function draw() {
             ctx.clearRect(0, 0, W, H);
             ctx.drawImage(bg, 0, 0);
-            ctx.drawImage(broom, 8.4, 104.24);
+            ctx.drawImage(broom, broomX, 104.24);
             ctx.drawImage(candles, 548.3, 473)
 
             // Configura a opacidade da chama usando a função de transição suave
@@ -67,8 +72,8 @@
             ctx.drawImage(flame, 552.9, 473.4)
             ctx.globalAlpha = 1; // Restaura a opacidade global
 
-            ctx.drawImage(nameGame, 244, 86);
-            ctx.drawImage(start, 284, 348);
+            ctx.drawImage(nameGame, 161, 94);
+            ctx.drawImage(start, 284, 310);
             ctx.drawImage(witch, 786, 278);
         }
 
@@ -94,7 +99,34 @@
                 animationStartTime = null;
             }
         }
+        // Função para animar a vassoura
+                function animateBroom() {
+            broomX += broomDirection * 2; // Ajuste a velocidade conforme necessário
 
+            if (broomX >= 100 || broomX <= 8.4) {
+                broomDirection *= -1; // Inverte a direção ao atingir as posições limites
+            }
+
+            draw();
+
+            // Continue a animação
+            broomAnimationTimeout = setTimeout(animateBroom, 16); // Aproximadamente 60 FPS
+
+            // Pare a animação após 2 segundos (2000 milissegundos)
+            if (broomAnimationTimeout && broomAnimationTimeout.startTime + 2000 < Date.now()) {
+                clearTimeout(broomAnimationTimeout);
+                broomAnimationTimeout = null;
+                broomX = 8.4; // Resetar a posição inicial da vassoura
+                draw(); // Redesenha o canvas para garantir que a posição inicial seja refletida
+            }
+        }
+
+            // Função para iniciar a animação da vassoura
+        function startBroomAnimation() {
+            broomAnimationTimeout = setTimeout(animateBroom, 0); // Iniciar a animação da vassoura
+            broomAnimationTimeout.startTime = Date.now(); // Marcar o tempo de início da animação
+        
+        }
 
         function isInside(pos, rect) {
             return pos.x > rect.x && pos.x < rect.x + rect.width && pos.y < rect.y + rect.height && pos.y > rect.y;
@@ -109,7 +141,7 @@
 
 
             //pointer no start
-            if (isInside(pos, { x: 284, y: 348, width: start.width, height: start.height })) {
+            if (isInside(pos, { x: 284, y: 310, width: start.width, height: start.height })) {
                 document.body.style.cursor = 'pointer';
                 start.src = '/images/Inicial/startGame2.svg';
                 draw();
@@ -139,7 +171,7 @@
                 y: e.clientY - canvas.offsetTop
             };
             //mudar para o game
-            if (isInside(pos, { x: 285, y: 305, width: start.width, height: start.height })) {
+            if (isInside(pos, { x: 285, y: 310, width: start.width, height: start.height })) {
                 window.location.href = 'code.html';
             }
             //clique vela
@@ -151,6 +183,7 @@
             //clique vassoura
             if (isInside(pos, { x: 8.4, y: 104.24, width: broom.width, height: broom.height })) {
                 console.log("vassoura")
+                startBroomAnimation(); // Iniciar a animação da vassoura
             }
         })
         //INICIALIZAÇÃO
