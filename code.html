@@ -50,7 +50,7 @@
         const btnReset = new Image();
         btnReset.src = '/images/reset.svg';
 
-        const mixingEllipsis = {x: 365, y: 368, radiusX: 120, radiusY: 55, color: 'white'};
+        const mixingEllipsis = {x: 365, y: 368, radiusX: 120, radiusY: 55, color: null};
 
         //POSIÇÕES DAS IMAGENS
         let potions = [
@@ -74,9 +74,7 @@
 
             ctx.beginPath();
             ctx.ellipse(mixingEllipsis.x, mixingEllipsis.y, mixingEllipsis.radiusX, mixingEllipsis.radiusY, 0, 0, Math.PI * 2);
-            ctx.fillStyle = mixingEllipsis.color;
             ctx.fill();
-            ctx.closePath();
 
             potions.forEach(potion => {
                 ctx.drawImage(potion.image, potion.frame*potion.width, 0, potion.width, potion.height, potion.x, potion.y, potion.width, potion.height);
@@ -197,54 +195,63 @@
             selectedPotion = null;
         });
 
-        //MISTURA DE CORES
         // MISTURA DE CORES
         function mixingPotions() {
+            const gradient = ctx.createRadialGradient(mixingEllipsis.x, mixingEllipsis.y, 0, mixingEllipsis.x, mixingEllipsis.y, mixingEllipsis.radiusX / 3);
+
             if (selectedPotion.frame === 5) {
-                if (mixingEllipsis.color == 'white') {
+                if (mixingEllipsis.color === null) {
                     if (selectedPotion.image === magentaPotion) {
-                    mixingEllipsis.color = 'magenta';
+                        mixingEllipsis.color = 'magenta';
                     }
-                    if (selectedPotion.image === bluePotion) {
+                    else if (selectedPotion.image === bluePotion) {
                         mixingEllipsis.color = 'cyan';
                     }
-                    if (selectedPotion.image === yellowPotion) {
+                    else if (selectedPotion.image === yellowPotion) {
                         mixingEllipsis.color = 'yellow';
                     }
+                    gradient.addColorStop(0, mixingEllipsis.color);
+                    gradient.addColorStop(1, 'black');
+                    ctx.fillStyle = gradient;
                 }
 
-                if (mixingEllipsis.color == 'magenta') {
+                if (mixingEllipsis.color === 'magenta' && selectedPotion.image !== magentaPotion) {
                     if (selectedPotion.image === bluePotion) {
                         mixingEllipsis.color = 'mediumpurple';
-                    }
-                    if (selectedPotion.image === yellowPotion) {
+                    } else if (selectedPotion.image === yellowPotion) {
                         mixingEllipsis.color = 'orange';
                     }
+                    gradient.addColorStop(0, mixingEllipsis.color);
+                    gradient.addColorStop(1, 'magenta');
+                    ctx.fillStyle = gradient;
                 }
 
-                if (mixingEllipsis.color == 'cyan') {
+                if (mixingEllipsis.color === 'cyan' && selectedPotion.image !== bluePotion) {
                     if (selectedPotion.image === magentaPotion) {
-                        mixingEllipsis.color = 'mediumpurple ';
-                    }
-                    if (selectedPotion.image === yellowPotion) {
+                        mixingEllipsis.color = 'mediumpurple';
+                    } else if (selectedPotion.image === yellowPotion) {
                         mixingEllipsis.color = 'green';
                     }
+                    gradient.addColorStop(0, mixingEllipsis.color);
+                    gradient.addColorStop(1, 'cyan');
+                    ctx.fillStyle = gradient;
                 }
 
-                if (mixingEllipsis.color == 'yellow') {
+                if (mixingEllipsis.color === 'yellow' && selectedPotion.image !== yellowPotion) {
                     if (selectedPotion.image === magentaPotion) {
                         mixingEllipsis.color = 'orange';
-                    }
-                    if (selectedPotion.image === bluePotion) {
+                    } else if (selectedPotion.image === bluePotion) {
                         mixingEllipsis.color = 'green';
                     }
+                    gradient.addColorStop(0, mixingEllipsis.color);
+                    gradient.addColorStop(1, 'yellow');
+                    ctx.fillStyle = gradient;
                 }
+                
                 draw();
-                fillEmptyPotions();
-            } 
-        };
+            }
+        }
 
-        
         //RESET
         function reset() {
             ctx.reset()
@@ -260,8 +267,8 @@
 
             ];
 
-            mixingEllipsis.color = 'white';
-            draw()
+            draw();
+            mixingEllipsis.color = null;
         }
 
         //INICIALIZAÇÃO
