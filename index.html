@@ -28,7 +28,10 @@
         broom.src = '/images/Inicial/broom.svg';
 
         const candles = new Image();
-        candles.src = '/images/Inicial/candles1.svg';
+        candles.src = '/images/Inicial/candles.svg';
+
+        const flame = new Image();
+        flame.src = '/images/Inicial/flame.svg';
 
         const witch = new Image();
         witch.src = '/images/Inicial/witch.svg';
@@ -49,6 +52,7 @@
             ctx.drawImage(bg, 0, 0);
             ctx.drawImage(broom, 8.4, 104.24)
             ctx.drawImage(candles, 548.3, 473)
+            ctx.drawImage(flame, 552.9, 473.4)
             ctx.drawImage(nameGame, 244, 86)
             ctx.drawImage(start, 285, 305)
             ctx.drawImage(witch, 786, 278)
@@ -66,12 +70,25 @@
             };
             let isClickable = false;
 
+
+            //pointer no start
             if (isInside(pos, { x: 285, y: 305, width: start.width, height: start.height })) {
                 document.body.style.cursor = 'pointer';
                 start.src = '/images/Inicial/startGame2.svg';
                 draw();
                 isClickable = true;
             }
+            //pointer nas velas
+            if (isInside(pos, { x: 548.3, y: 473.4, width: candles.width, height: candles.height })) {
+                document.body.style.cursor = 'pointer';
+                isClickable = true;
+            }
+            //clique vassoura
+            if (isInside(pos, { x: 8.4, y: 104.24, width: broom.width, height: broom.height })) {
+                document.body.style.cursor = 'pointer';
+                isClickable = true;
+            }
+            
             if (!isClickable) {
                 start.src = '/images/Inicial/startGame1.svg';
                 draw();
@@ -87,6 +104,14 @@
             //mudar para o game
             if (isInside(pos, { x: 285, y: 305, width: start.width, height: start.height })) {
                 window.location.href = 'code.html';
+            }
+            //clique vela
+            if (isInside(pos, { x: 548.3, y: 473.4, width: candles.width, height: candles.height })) {
+                console.log("vela")
+            }
+            //clique vassoura
+            if (isInside(pos, { x: 8.4, y: 104.24, width: broom.width, height: broom.height })) {
+                console.log("vassoura")
             }
         })
         //INICIALIZAÇÃO
