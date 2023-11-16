@@ -20,51 +20,51 @@
         const W = canvas.width;
         const H = canvas.height;
 
-        const bg = new Image();
-        bg.src = '/images/fundo.svg';
+        let numResourcesLoaded = 0;
+        let potions;
 
-        const cauldron = new Image();
-        cauldron.src = '/images/cauldron.svg';
-
-        const magentaPotion = new Image();
-        magentaPotion.src = 'images/magentaPotion.svg';
-
-        const yellowPotion = new Image();
-        yellowPotion.src = 'images/yellowPotion.svg';
-
-        const bluePotion = new Image();
-        bluePotion.src = 'images/cyanPotion.svg';
-
-        const potion1 = new Image();
-        potion1.src = 'images/emptyBottle.svg';
-
-        const potion2 = new Image();
-        potion2.src = 'images/emptyBottle.svg';
-
-        const potion3 = new Image();
-        potion3.src = 'images/emptyBottle.svg';
-
-        const overlay = new Image();
-        overlay.src = '/images/vignette.svg';
-
-        const btnReset = new Image();
-        btnReset.src = '/images/reset.svg';
+        const bg = loadImage('fundo');
+        const cauldron = loadImage('cauldron');
+        const magentaPotion = loadImage('magentaPotion');
+        const yellowPotion = loadImage('yellowPotion');
+        const cyanPotion = loadImage('cyanPotion');
+        const emptyBottle = loadImage('emptyBottle');
+        const overlay = loadImage('vignette');
+        const btnReset = loadImage('btnReset');
+        const greenPotion = loadImage('greenPotion');
+        const purplePotion = loadImage('purplePotion');
+        const orangePotion = loadImage('orangePotion');
 
         const mixingEllipsis = {x: 365, y: 368, radiusX: 120, radiusY: 55, color: null};
 
         //POSIÇÕES DAS IMAGENS
-        let potions = [
-            { image: magentaPotion, x: 660, y: 165, width: 92.65, height: magentaPotion.height, frame: 0 },
-            { image: yellowPotion, x: 760, y: 165, width: 92.65, height: yellowPotion.height, frame: 0 },
-            { image: bluePotion, x: 860, y: 165, width: 92.65, height: bluePotion.height, frame: 0 },
-            { image: potion1, x: 660, y: 315, width: 92.65, height: potion1.height, frame: 0 },
-            { image: potion2, x: 760, y: 315, width: 92.65, height: potion2.height, frame: 0 },
-            { image: potion3, x: 860, y: 315, width: 92.65, height: potion3.height, frame: 0 }
-        ];
 
         let selectedPotion = null;
         let offsetX, offsetY;
 
+        function loadImage(name) {
+			let img = new Image();
+			img.src = "images/" + name + ".svg";
+            img.onload = function() {
+                resourceLoaded()
+            }
+            return img
+		}
+
+        function resourceLoaded() {
+			numResourcesLoaded++;
+			if (numResourcesLoaded == 11) {
+                potions = [
+                { image: magentaPotion, x: 660, y: 165, width: 92.65, height: magentaPotion.height, frame: 0 },
+                { image: yellowPotion, x: 760, y: 165, width: 92.65, height: yellowPotion.height, frame: 0 },
+                { image: cyanPotion, x: 860, y: 165, width: 92.65, height: cyanPotion.height, frame: 0 },
+                { image: emptyBottle, x: 660, y: 315, width: 92.65, height: emptyBottle.height, frame: 0 },
+                { image: emptyBottle, x: 760, y: 315, width: 92.65, height: emptyBottle.height, frame: 0 },
+                { image: emptyBottle, x: 860, y: 315, width: 92.65, height: emptyBottle.height, frame: 0 }
+                ];
+				draw()
+			}
+		}
 
         //FUNÇÃO PARA DESENHAR
         function draw() {
@@ -180,17 +180,28 @@
 
         //MOUSE UP
         canvas.addEventListener('mouseup', (e) => {
+            if (mixingEllipsis.color == 'mediumpurple' && potions.find(potion => potion.image == purplePotion) == null) {
+                potions.find(potion => potion.image == emptyBottle).image = purplePotion
+            } else if (mixingEllipsis.color == 'orange' && potions.find(potion => potion.image == orangePotion) == null) {
+                potions.find(potion => potion.image == emptyBottle).image = orangePotion
+            } if (mixingEllipsis.color == 'green' && potions.find(potion => potion.image == greenPotion) == null) {
+                potions.find(potion => potion.image == emptyBottle).image = greenPotion
+            }
 
-            //voltar poção para a parteleira
-            potions = [
-                { image: magentaPotion, x: 660, y: 165, width: 92.65, height: magentaPotion.height, frame: 0 },
-                { image: yellowPotion, x: 760, y: 165, width: 92.65, height: yellowPotion.height, frame: 0 },
-                { image: bluePotion, x: 860, y: 165, width: 92.65, height: bluePotion.height, frame: 0 },
-                { image: potion1, x: 660, y: 315, width: 92.65, height: potion1.height, frame: 0 },
-                { image: potion2, x: 760, y: 315, width: 92.65, height: potion2.height, frame: 0 },
-                { image: potion3, x: 860, y: 315, width: 92.65, height: potion3.height, frame: 0 }
+            potions.forEach(potion => potion.frame = 0)
+            potions[0].x = 660
+            potions[0].y = 165
+            potions[1].x = 760
+            potions[1].y = 165
+            potions[2].x = 860
+            potions[2].y = 165
+            potions[3].x = 660
+            potions[3].y = 315
+            potions[4].x = 760
+            potions[4].y = 315
+            potions[5].x = 860
+            potions[5].y = 315
 
-            ];
             draw()
             selectedPotion = null;
         });
@@ -204,7 +215,7 @@
                     if (selectedPotion.image === magentaPotion) {
                         mixingEllipsis.color = 'magenta';
                     }
-                    else if (selectedPotion.image === bluePotion) {
+                    else if (selectedPotion.image === cyanPotion) {
                         mixingEllipsis.color = 'cyan';
                     }
                     else if (selectedPotion.image === yellowPotion) {
@@ -216,7 +227,7 @@
                 }
 
                 if (mixingEllipsis.color === 'magenta' && selectedPotion.image !== magentaPotion) {
-                    if (selectedPotion.image === bluePotion) {
+                    if (selectedPotion.image === cyanPotion) {
                         mixingEllipsis.color = 'mediumpurple';
                     } else if (selectedPotion.image === yellowPotion) {
                         mixingEllipsis.color = 'orange';
@@ -226,7 +237,7 @@
                     ctx.fillStyle = gradient;
                 }
 
-                if (mixingEllipsis.color === 'cyan' && selectedPotion.image !== bluePotion) {
+                if (mixingEllipsis.color === 'cyan' && selectedPotion.image !== cyanPotion) {
                     if (selectedPotion.image === magentaPotion) {
                         mixingEllipsis.color = 'mediumpurple';
                     } else if (selectedPotion.image === yellowPotion) {
@@ -240,7 +251,7 @@
                 if (mixingEllipsis.color === 'yellow' && selectedPotion.image !== yellowPotion) {
                     if (selectedPotion.image === magentaPotion) {
                         mixingEllipsis.color = 'orange';
-                    } else if (selectedPotion.image === bluePotion) {
+                    } else if (selectedPotion.image === cyanPotion) {
                         mixingEllipsis.color = 'green';
                     }
                     gradient.addColorStop(0, mixingEllipsis.color);
@@ -255,26 +266,9 @@
         //RESET
         function reset() {
             ctx.reset()
-            cauldron.src = '/images/cauldron.svg';
-
-            potions = [
-                { image: magentaPotion, x: 660, y: 165, width: 92.65, height: magentaPotion.height, frame: 0 },
-                { image: yellowPotion, x: 760, y: 165, width: 92.65, height: yellowPotion.height, frame: 0 },
-                { image: bluePotion, x: 860, y: 165, width: 92.65, height: bluePotion.height, frame: 0 },
-                { image: potion1, x: 660, y: 315, width: 92.65, height: potion1.height, frame: 0 },
-                { image: potion2, x: 760, y: 315, width: 92.65, height: potion2.height, frame: 0 },
-                { image: potion3, x: 860, y: 315, width: 92.65, height: potion3.height, frame: 0 }
-
-            ];
-
-            draw();
             mixingEllipsis.color = null;
-        }
-
-        //INICIALIZAÇÃO
-        window.onload = function () {
             draw();
-        };
+        }
 
     </script>
 
