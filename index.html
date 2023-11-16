@@ -52,7 +52,7 @@
         // Variáveis para a animação da vassoura
         let broomX = 8.4; // Posição inicial da vassoura
         let broomDirection = 1; // Direção inicial da animação (1 para direita, -1 para esquerda)
-        let broomAnimationTimeout; // Referência para o timeout da animação da vassoura
+        let verifica = 0;
 
         // Função de transição suave
         function easeInOutQuad(t) {
@@ -100,7 +100,7 @@
             }
         }
         // Função para animar a vassoura
-                function animateBroom() {
+        function animateBroom() {
             broomX += broomDirection * 2; // Ajuste a velocidade conforme necessário
 
             if (broomX >= 100 || broomX <= 8.4) {
@@ -110,23 +110,19 @@
             draw();
 
             // Continue a animação
-            broomAnimationTimeout = setTimeout(animateBroom, 16); // Aproximadamente 60 FPS
-
-            // Pare a animação após 2 segundos (2000 milissegundos)
-            if (broomAnimationTimeout && broomAnimationTimeout.startTime + 2000 < Date.now()) {
-                clearTimeout(broomAnimationTimeout);
-                broomAnimationTimeout = null;
-                broomX = 8.4; // Resetar a posição inicial da vassoura
-                draw(); // Redesenha o canvas para garantir que a posição inicial seja refletida
+            if (verifica < 4) {
+                broomAnimationTimeout = setTimeout(animateBroom, 16); // Aproximadamente 60 FPS
+            } else {
+                // Variáveis para a animação da vassoura
+                broomX = 8.4; // Posição inicial da vassoura
+                broomDirection = 1; // Direção inicial da animação (1 para direita, -1 para esquerda)
+                draw();
             }
+
+
         }
 
-            // Função para iniciar a animação da vassoura
-        function startBroomAnimation() {
-            broomAnimationTimeout = setTimeout(animateBroom, 0); // Iniciar a animação da vassoura
-            broomAnimationTimeout.startTime = Date.now(); // Marcar o tempo de início da animação
-        
-        }
+
 
         function isInside(pos, rect) {
             return pos.x > rect.x && pos.x < rect.x + rect.width && pos.y < rect.y + rect.height && pos.y > rect.y;
@@ -165,6 +161,8 @@
             }
         });
 
+
+
         canvas.addEventListener('click', (e) => {
             const pos = {
                 x: e.clientX - canvas.offsetLeft,
@@ -178,12 +176,19 @@
             if (isInside(pos, { x: 548.3, y: 473.4, width: candles.width, height: candles.height })) {
                 animationStartTime = null; // Resetar o tempo de início
                 requestAnimationFrame(animateTransparency);
-                console.log("vela")
             }
+
             //clique vassoura
             if (isInside(pos, { x: 8.4, y: 104.24, width: broom.width, height: broom.height })) {
-                console.log("vassoura")
-                startBroomAnimation(); // Iniciar a animação da vassoura
+                verifica = verifica + 1;
+
+                if (verifica <= 4) {
+                    animateBroom(); // Iniciar a animação da vassoura
+                }
+                if (verifica == 5) {
+                    verifica = 0
+                }
+
             }
         })
         //INICIALIZAÇÃO
