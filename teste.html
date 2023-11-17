@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ColorMix</title>
+</head>
+
+<body>
+    <!-- desenha o canvas -->
+    <div style="display: flex; justify-content: center; align-items: center; margin: auto; height: 95vh;">
+        <canvas width="1000" height="700" style="border:solid 1px black" id="myCanvas"></canvas>
+    </div>
+
+    <script>
+        //Const
+        const canvas = document.getElementById(`myCanvas`);
+        const ctx = canvas.getContext(`2d`);
+        const W = canvas.width;
+        const H = canvas.height;
+
+        let numResourcesLoaded = 0;
+        let potions;
+
+        const bg = loadImage('fundo');
+        const cauldron = loadImage('cauldron');
+        const magentaPotion = loadImage('magentaPotion');
+        const yellowPotion = loadImage('yellowPotion');
+        const cyanPotion = loadImage('cyanPotion');
+        const emptyBottle = loadImage('emptyBottle');
+        const overlay = loadImage('vignette');
+        const btnReset = loadImage('btnReset');
+        const greenPotion = loadImage('greenPotion');
+        const purplePotion = loadImage('purplePotion');
+        const orangePotion = loadImage('orangePotion');
+
+        const mixingEllipsis = {x: 365, y: 368, radiusX: 120, radiusY: 55, color: null};
+
+        //POSIÇÕES DAS IMAGENS
+
+        let selectedPotion = null;
+        let offsetX, offsetY;
+
+        function loadImage(name) {
+			let img = new Image();
+			img.src = "images/" + name + ".svg";
+            img.onload = function() {
+                resourceLoaded()
+            }
+            return img
+		}
+
+        function resourceLoaded() {
+			numResourcesLoaded++;
+			if (numResourcesLoaded == 11) {
+                potions = [
+                { image: magentaPotion, x: 660, y: 165, width: 92.65, height: magentaPotion.height, frame: 0 },
+                { image: yellowPotion, x: 760, y: 165, width: 92.65, height: yellowPotion.height, frame: 0 },
+                { image: cyanPotion, x: 860, y: 165, width: 92.65, height: cyanPotion.height, frame: 0 },
+                { image: emptyBottle, x: 660, y: 315, width: 92.65, height: emptyBottle.height, frame: 0 },
+                { image: emptyBottle, x: 760, y: 315, width: 92.65, height: emptyBottle.height, frame: 0 },
+                { image: emptyBottle, x: 860, y: 315, width: 92.65, height: emptyBottle.height, frame: 0 }
+                ];
+				draw()
+			}
+		}
+
+        //FUNÇÃO PARA DESENHAR
+        function draw() {
+            ctx.clearRect(0, 0, W, H);
+            ctx.drawImage(bg, 0, 0);
+            ctx.drawImage(cauldron, 200, 300, cauldron.width * 2.5, cauldron.height * 2.5);
+
+            ctx.beginPath();
+            ctx.ellipse(mixingEllipsis.x, mixingEllipsis.y, mixingEllipsis.radiusX, mixingEllipsis.radiusY, 0, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            potions.forEach(potion => {
+                ctx.drawImage(potion.image, potion.frame*potion.width, 0, potion.width, potion.height, potion.x, potion.y, potion.width, potion.height);
+            });
+            ctx.drawImage(overlay, 0, 0)
+            ctx.drawImage(btnReset, 930, 20, btnReset.width * 0.35, btnReset.height * 0.35)
+        }
+
+        //INSIDE
+        function isInside(pos, rect) {
+            return pos.x > rect.x && pos.x < rect.x + rect.width && pos.y < rect.y + rect.height && pos.y > rect.y;
+        }
+
+        //RESET
+        canvas.addEventListener('click', (e) => {
+            const pos = {
+                x: e.clientX - canvas.offsetLeft,
+                y: e.clientY - canvas.offsetTop
+            };
+
+            if (isInside(pos, { x: 930, y: 20, width: btnReset.width * 0.35, height: btnReset.height * 0.35 })) {
+                reset()
+            }
+        })
+
+        //VERIFICA COLISÃO
+        function checkCollision(potion, cauldron) {
+            return (
+                potion.x < cauldron.x + cauldron.width &&
+                potion.x + potion.width > cauldron.x &&
+                potion.y < cauldron.y + cauldron.height &&
+                potion.y + potion.height > cauldron.y
+            );
+        }
+
+
+        //MOUSE MOVE
+        canvas.addEventListener('mousemove', (e) => {
+            const pos = {
+                x: e.clientX - canvas.offsetLeft,
+                y: e.clientY - canvas.offsetTop
+            };
+
+            let isClickable = false;
+
+            potions.forEach(potion => {
+                if (isInside(pos, potion)) {
+                    document.body.style.cursor = 'pointer';
+
+                    isClickable = true;
+                }
+            });
+
+            if (isInside(pos, { x: 930, y: 20, width: btnReset.width * 0.35, height: btnReset.height * 0.35 })) {
+                document.body.style.cursor = 'pointer';
+                isClickable = true;
+            }
+
+            if (!isClickable) {
+                document.body.style.cursor = 'default';
+            }
+
+            if (selectedPotion !== null) {
+                document.body.style.cursor = 'pointer';
+
+                selectedPotion.x = pos.x - offsetX;
+                selectedPotion.y = pos.y - offsetY;
+
+
+                if (checkCollision(selectedPotion, { x: 270+cauldron.width*1.7*0.5, y: 250, width: cauldron.width*1.7*0.125, height: 100 })) {
+                    selectedPotion.frame = 5
+                    mixingPotions()
+                } else if (checkCollision(selectedPotion, { x: 270+cauldron.width*1.7*0.625, y: 250, width: cauldron.width*1.7*0.125, height: 100 }) || checkCollision(selectedPotion, { x: 270+cauldron.width*1.7*0.375, y: 250, width: cauldron.width*1.7*0.125, height: 100 })) {
+                    selectedPotion.frame = 4
+                } else if (checkCollision(selectedPotion, { x: 270+cauldron.width*1.7*0.75, y: 250, width: cauldron.width*1.7*0.125, height: 100 }) || checkCollision(selectedPotion, { x: 270+cauldron.width*1.7*0.25, y: 250, width: cauldron.width*1.7*0.125, height: 100 })) {
+                    selectedPotion.frame = 3
+                } else if (checkCollision(selectedPotion, { x: 270+cauldron.width*1.7, y: 250, width: cauldron.width*1.7*0.125, height: 100 }) || checkCollision(selectedPotion, { x: 270+cauldron.width*1.7*0.125, y: 250, width: cauldron.width*1.7*0.125, height: 100 })) {
+                    selectedPotion.frame = 2
+                } else {
+                    selectedPotion.frame = 1
+                }
+
+                draw();
+            }
+        });
+
+
+        //MOUSE DOWN
+        canvas.addEventListener('mousedown', (e) => {
+            const pos = {
+                x: e.clientX - canvas.offsetLeft,
+                y: e.clientY - canvas.offsetTop
+            };
+
+            potions.forEach(potion => {
+                if (isInside(pos, potion)) {
+                    selectedPotion = potion;
+                    offsetX = pos.x - potion.x;
+                    offsetY = pos.y - potion.y;
+                }
+            });
+        });
+
+        //MOUSE UP
+        canvas.addEventListener('mouseup', (e) => {
+            if (mixingEllipsis.color == 'mediumpurple' && potions.find(potion => potion.image == purplePotion) == null) {
+                potions.find(potion => potion.image == emptyBottle).image = purplePotion
+            } else if (mixingEllipsis.color == 'orange' && potions.find(potion => potion.image == orangePotion) == null) {
+                potions.find(potion => potion.image == emptyBottle).image = orangePotion
+            } if (mixingEllipsis.color == 'green' && potions.find(potion => potion.image == greenPotion) == null) {
+                potions.find(potion => potion.image == emptyBottle).image = greenPotion
+            }
+
+            potions.forEach(potion => potion.frame = 0)
+            potions[0].x = 660
+            potions[0].y = 165
+            potions[1].x = 760
+            potions[1].y = 165
+            potions[2].x = 860
+            potions[2].y = 165
+            potions[3].x = 660
+            potions[3].y = 315
+            potions[4].x = 760
+            potions[4].y = 315
+            potions[5].x = 860
+            potions[5].y = 315
+
+            draw()
+            selectedPotion = null;
+        });
+
+        let gradient;
+        let radius = 40;
+        let animationID;
+
+        function animateGradient() {
+            if (radius <= mixingEllipsis.radiusX && !(radius >= 120)) {
+                radius += 10;
+                gradient = ctx.createRadialGradient(mixingEllipsis.x, mixingEllipsis.y, 0, mixingEllipsis.x, mixingEllipsis.y, radius);
+                draw();
+                console.log(radius);
+                animationID = requestAnimationFrame(animateGradient);
+            } else {
+                cancelAnimationFrame(animationID)
+            }
+        }
+
+        // COLOR MIXING
+        function mixingPotions() {
+            gradient = ctx.createRadialGradient(mixingEllipsis.x, mixingEllipsis.y, 0, mixingEllipsis.x, mixingEllipsis.y, radius);
+
+            if (selectedPotion.frame === 5) {
+                if (mixingEllipsis.color === null) {
+                    switch (selectedPotion.image) {
+                        case magentaPotion:
+                            mixingEllipsis.color = 'magenta';
+                            break;
+                        case cyanPotion:
+                            mixingEllipsis.color = 'cyan';
+                            break;
+                        case yellowPotion:
+                            mixingEllipsis.color = 'yellow';
+                            break;
+                    }
+                    gradient.addColorStop(0, mixingEllipsis.color);
+                    gradient.addColorStop(1, 'black');
+                    ctx.fillStyle = gradient;
+                }
+
+                if (mixingEllipsis.color === 'magenta' && selectedPotion.image !== magentaPotion) {
+                    switch (selectedPotion.image) {
+                        case cyanPotion:
+                            mixingEllipsis.color = 'mediumpurple';
+                            break;
+                        case yellowPotion:
+                            mixingEllipsis.color = 'orange';
+                            break;
+                    }
+                    gradient.addColorStop(0, mixingEllipsis.color);
+                    gradient.addColorStop(1, 'magenta');
+                    ctx.fillStyle = gradient;
+                }
+
+                if (mixingEllipsis.color === 'cyan' && selectedPotion.image !== cyanPotion) {
+                    switch (selectedPotion.image) {
+                        case magentaPotion:
+                            mixingEllipsis.color = 'mediumpurple';
+                            break;
+                        case yellowPotion:
+                            mixingEllipsis.color = 'green';
+                            break;
+                    }
+                    gradient.addColorStop(0, mixingEllipsis.color);
+                    gradient.addColorStop(1, 'cyan');
+                    ctx.fillStyle = gradient;
+                }
+
+                if (mixingEllipsis.color === 'yellow' && selectedPotion.image !== yellowPotion) {
+                    switch (selectedPotion.image) {
+                        case magentaPotion:
+                            mixingEllipsis.color = 'orange';
+                            break;
+                        case cyanPotion:
+                            mixingEllipsis.color = 'green';
+                            break;
+                    }
+                    gradient.addColorStop(0, mixingEllipsis.color);
+                    gradient.addColorStop(1, 'yellow');
+                    ctx.fillStyle = gradient;
+                }
+
+                setTimeout(function () {
+                    requestAnimationFrame(animateGradient);
+                }, 500);
+            }
+        }
+
+        //RESET
+        function reset() {
+            cancelAnimationFrame(animationID);
+            ctx.reset()
+            mixingEllipsis.color = null;
+            draw();
+        }
+
+    </script>
+
+</body>
+
+</html>
