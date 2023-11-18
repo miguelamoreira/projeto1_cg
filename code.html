@@ -188,19 +188,21 @@
                 potions.find(potion => potion.image == emptyBottle).image = greenPotion
             }
 
-            potions.forEach(potion => potion.frame = 0)
-            potions[0].x = 660
-            potions[0].y = 165
-            potions[1].x = 760
-            potions[1].y = 165
-            potions[2].x = 860
-            potions[2].y = 165
-            potions[3].x = 660
-            potions[3].y = 315
-            potions[4].x = 760
-            potions[4].y = 315
-            potions[5].x = 860
-            potions[5].y = 315
+            potions.forEach(function(potion, potionIndex) {
+                potion.frame = 0
+                if (potionIndex < 3) {
+                    potion.y = 165
+                } else {
+                    potion.y = 315
+                }
+                if (potionIndex == 0 || potionIndex == 3) {
+                    potion.x = 660
+                } else if (potionIndex == 1 || potionIndex == 4) {
+                    potion.x = 760
+                } else {
+                    potion.x = 860
+                }
+            })
 
             draw()
             selectedPotion = null;

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+    }
+  </style>
+  <title>Elliptical Gradient Animation</title>
+</head>
+
+<body>
+  <canvas id="myCanvas"></canvas>
+
+  <script>
+    // Get the canvas element and its context
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Set canvas size
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Define initial variables
+    let centerX = canvas.width / 2;
+    let centerY = canvas.height / 2;
+    let ellipseRadiusX = 150; // Adjust the ellipse x-radius
+    let ellipseRadiusY = 100; // Adjust the ellipse y-radius
+    let gradientRadiusX = 0;
+    let gradientRadiusY = 0;
+    let gradientColor = 'rgba(255, 0, 0, 1)'; // Initial color (red)
+
+    // Flags to track animation state
+    let animationInProgress = false;
+    let animationCompleted = false;
+
+    function animate() {
+      // Clear the canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Create the elliptical clipping path
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(centerX, centerY, ellipseRadiusX, ellipseRadiusY, 0, 0, 2 * Math.PI);
+      ctx.clip();
+
+      // Draw the elliptical radial gradient
+      const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, gradientRadiusX, centerY, gradientRadiusY);
+      gradient.addColorStop(0, gradientColor);
+      gradient.addColorStop(1, 'transparent');
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Restore the previous state to remove the clipping path
+      ctx.restore();
+
+      // Increase the gradient radii for the expansion effect
+      gradientRadiusX += 2;
+      gradientRadiusY += 1; // Adjust the expansion rate for the y-axis
+
+      // Change color as the gradient expands
+      const maxColorValue = 255;
+      const alpha = gradientRadiusX / canvas.width; // Adjust alpha based on canvas width
+      gradientColor = `rgba(${maxColorValue}, 0, 0, ${1 - alpha})`;
+
+      // Check if the ellipse is entirely red, and stop the animation
+      if (gradientRadiusX >= ellipseRadiusX && gradientRadiusY >= ellipseRadiusY) {
+        animationInProgress = false;
+        animationCompleted = true;
+        return;
+      }
+
+      // Request the next frame of the animation
+      requestAnimationFrame(animate);
+    }
+
+    // Check if the mouse is inside the ellipse on mousemove
+    canvas.addEventListener('mousemove', (e) => {
+      if (!animationInProgress && !animationCompleted) {
+        const mouseX = e.clientX;
+        const mouseY = e.clientY;
+
+        // Calculate distance from the center of the ellipse
+        const distanceX = mouseX - centerX;
+        const distanceY = mouseY - centerY;
+
+        // Check if the mouse is inside the ellipse
+        const mouseInsideEllipse = (distanceX * distanceX) / (ellipseRadiusX * ellipseRadiusX) +
+          (distanceY * distanceY) / (ellipseRadiusY * ellipseRadiusY) <= 1;
+
+        // Start the animation when the mouse is inside the ellipse
+        if (mouseInsideEllipse) {
+          animationInProgress = true;
+          animate();
+        }
+      }
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      centerX = canvas.width / 2;
+      centerY = canvas.height / 2;
+    });
+  </script>
+</body>
+
+</html>
