@@ -43,14 +43,19 @@
     let animationCompleted = false;
 
     function animate() {
-      // Clear the canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
       // Create the elliptical clipping path
       ctx.save();
       ctx.beginPath();
       ctx.ellipse(centerX, centerY, ellipseRadiusX, ellipseRadiusY, 0, 0, 2 * Math.PI);
       ctx.clip();
+
+      // Draw the existing content
+      // (Assuming there's content already on the canvas that you want to keep)
+      // This could be an image, other shapes, etc.
+      // Replace this with your existing content drawing code
+      // For demonstration, let's fill the canvas with a semi-transparent black
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Draw the elliptical radial gradient
       const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, gradientRadiusX, centerY, gradientRadiusY);
@@ -82,6 +87,7 @@
       // Request the next frame of the animation
       requestAnimationFrame(animate);
     }
+
 
     // Check if the mouse is inside the ellipse on mousemove
     canvas.addEventListener('mousemove', (e) => {
