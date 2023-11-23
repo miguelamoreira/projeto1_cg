@@ -10,7 +10,7 @@
 <body>
     <!-- desenha o canvas -->
     <div style="display: flex; justify-content: center; align-items: center; margin: auto; height: 95vh;">
-        <canvas width="1000" height="700" style="border:solid 0px" , id="myCanvas"></canvas>
+        <canvas width="1000" height="700" style="border:solid 0px;" id="myCanvas"></canvas>
     </div>
 
     <script>
@@ -54,6 +54,10 @@
         let broomDirection = 1; // Direção inicial da animação (1 para direita, -1 para esquerda)
         let verifica = 0;
 
+        let witchScale = 1; // Escala inicial da bruxa
+        let witchAnimationStartTime; // Tempo de início da animação da bruxa
+        let witchX = 786;
+        let witchY = 278;
 
         // Função de transição suave
         function easeInOutQuad(t) {
@@ -75,9 +79,11 @@
 
             ctx.drawImage(nameGame, 161, 94);
             ctx.drawImage(start, 284, 310);
-            ctx.drawImage(witch, 786, 278);
+
+            ctx.drawImage(witch, witchX, witchY, witch.width * witchScale, witch.height * witchScale);
+
         }
-        
+
         // Função para animar a transparência da chama
         function animateTransparency(timestamp) {
             if (!animationStartTime) {
@@ -122,6 +128,33 @@
 
 
         }
+
+        // Função para animar a bruxa
+        function animateWitch(timestamp) {
+            if (!witchAnimationStartTime) {
+                witchAnimationStartTime = timestamp;
+            }
+
+            const elapsed = timestamp - witchAnimationStartTime;
+            const progress = Math.min(elapsed / 4000, 1); // Duração da animação em milissegundos
+
+            // Ajuste a escala e posição da bruxa
+            witchScale = 1 + Math.sin(progress * Math.PI) * 0.5;
+            const witchX = 786 - (witch.width * witchScale) / 2;
+            const witchY = 278 - (witch.height * witchScale) / 2;
+
+            draw();
+
+            if (progress < 1) {
+                requestAnimationFrame(animateWitch);
+            } else {
+                // Reinicia para o estado original após 4 segundos
+                witchScale = 1;
+                witchAnimationStartTime = null;
+            }
+        }
+
+
 
         function isInside(pos, rect) {
             return pos.x > rect.x && pos.x < rect.x + rect.width && pos.y < rect.y + rect.height && pos.y > rect.y;
@@ -183,8 +216,10 @@
             }
 
             //pointer bruxa
-            if (isInside(pos, { x: 786, y: 278, width: witch.width, height: witch.height })) {
+            if (isInside(pos, { x: 786, y: 278, width: witch.width * witchScale, height: witch.height * witchScale })) {
                 console.log("bruxa")
+                witchAnimationStartTime = null; // Resetar o tempo de início
+                requestAnimationFrame(animateWitch);
 
             }
             //clique vassoura
@@ -201,9 +236,11 @@
             }
         })
         //INICIALIZAÇÃO
-        window.onload = function () {
+
+        bg.onload = broom.onload = candles.onload = flame.onload = witch.onload = overlay.onload = start.onload = nameGame.onload = function () {
             draw();
         };
+
     </script>
 </body>
 
