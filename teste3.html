@@ -36,7 +36,7 @@
         const purplePotion = loadImage('purplePotion');
         const orangePotion = loadImage('orangePotion');
 
-        const mixingEllipsis = { x: 365, y: 371, radiusX: 119, radiusY: 51, color: 'transparent' };
+        const mixingEllipsis = { x: 365, y: 372, radiusX: 116, radiusY: 48, color: 'rgba(40, 58, 81, 0)' };
         let gradientRadiusX;
         let gradientRadiusY;
         let animationInProgress;
@@ -206,17 +206,9 @@
         //MOUSE UP
         canvas.addEventListener('mouseup', (e) => {
             if (selectedPotion.frame == 5 && !animationCompleted && !animationInProgress && selectedPotion.color != 'transparent' && mixingEllipsis.color != 'rgba(255, 170, 0, 1)' && mixingEllipsis.color != 'rgba(170, 0, 255, 1)' && mixingEllipsis.color != 'rgba(0, 255, 0, 1)') {
-                potionColor = selectedPotion.color
+                potionColor = selectedPotion.color;
                 animationInProgress = true;
                 animate();
-            }
-
-            if (mixingEllipsis.color == 'mediumpurple' && potions.find(potion => potion.image == purplePotion) == null) {
-                potions.find(potion => potion.image == emptyBottle).image = purplePotion
-            } else if (mixingEllipsis.color == 'orange' && potions.find(potion => potion.image == orangePotion) == null) {
-                potions.find(potion => potion.image == emptyBottle).image = orangePotion
-            } if (mixingEllipsis.color == 'green' && potions.find(potion => potion.image == greenPotion) == null) {
-                potions.find(potion => potion.image == emptyBottle).image = greenPotion
             }
 
             potions.forEach(function (potion, potionIndex) {
@@ -293,7 +285,7 @@
             ctx.restore();
 
             // Increase the gradient radii for the expansion effect
-            gradientRadiusX += 2;
+            gradientRadiusX += 3;
             gradientRadiusY += 1; // Adjust the expansion rate for the y-axis
 
             // Change color as the gradient expands
@@ -302,7 +294,7 @@
             potionColor = `rgba(${maxColorValue}, ${1 - alpha})`;
 
             // Check if the ellipse is entirely red, and stop the animation
-            if (gradientRadiusX >= mixingEllipsis.radiusX+300 && gradientRadiusY >= mixingEllipsis.radiusY+300) {
+            if (gradientRadiusX >= mixingEllipsis.radiusX+350 && gradientRadiusY >= mixingEllipsis.radiusY+150) {
                 animationInProgress = false;
                 animationCompleted = true;
                 mixingEllipsis.color = `rgba(${maxColorValue}, 1)`;
@@ -322,7 +314,7 @@
         // RESET
         function reset() {
             cancelAnimation = true;
-            mixingEllipsis.color = 'transparent';
+            mixingEllipsis.color = 'rgba(40, 58, 81, 0)';
             draw();
         }
 
