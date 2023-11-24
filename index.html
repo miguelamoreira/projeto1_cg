@@ -8,19 +8,19 @@
 </head>
 
 <body>
-    <!-- desenha o canvas -->
+    <!-- Desenho do canvas da aplicação -->
     <div style="display: flex; justify-content: center; align-items: center; margin: auto; height: 95vh;">
         <canvas width="1000" height="700" style="border:solid 0px;" id="myCanvas"></canvas>
     </div>
 
     <script>
-        //Const
+        //  Inicialização de variáveis
         const canvas = document.getElementById(`myCanvas`);
         const ctx = canvas.getContext(`2d`);
         const W = canvas.width;
         const H = canvas.height;
 
-        //carregar imagens
+        //  Importação de imagens e respetivos posicionamentos
         const bg = new Image();
         bg.src = '/images/Inicial/backgraund.svg';
 
@@ -59,7 +59,7 @@
         let witchX = 786;
         let witchY = 278;
 
-        // Função de transição suave
+        //  Função de transição suave
         function easeInOutQuad(t) {
             return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
         }

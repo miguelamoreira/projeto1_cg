@@ -8,13 +8,13 @@
 </head>
 
 <body>
-    <!-- desenha o canvas -->
+    <!-- Desenho do canvas da aplicação -->
     <div style="display: flex; justify-content: center; align-items: center; margin: auto; height: 95vh;">
-        <canvas width="1000" height="700" style="border:solid 0px;" id="myCanvas"></canvas>
+        <canvas width="1000" height="700" style="border:solid 1px black" id="myCanvas"></canvas>
     </div>
 
     <script>
-        //Const
+        //  Inicialização de variáveis
         const canvas = document.getElementById(`myCanvas`);
         const ctx = canvas.getContext(`2d`);
         const W = canvas.width;
@@ -36,9 +36,15 @@
         const purplePotion = loadImage('purplePotion');
         const orangePotion = loadImage('orangePotion');
 
-        const mixingEllipsis = { x: 365, y: 368, radiusX: 120, radiusY: 55, color: null };
-
-        //POSIÇÕES DAS IMAGENS
+        const mixingEllipsis = { x: 365, y: 372, radiusX: 116, radiusY: 48, color: 'rgba(40, 58, 81, 0)' };
+        let gradientRadiusX;
+        let gradientRadiusY;
+        let animationInProgress;
+        let animationCompleted;
+        let potionColor;
+        let cancelAnimation;
+        
+        //  Importação de imagens e respetivos posicionamentos
 
         let selectedPotion = null;
         let offsetX, offsetY;
@@ -56,59 +62,64 @@
             numResourcesLoaded++;
             if (numResourcesLoaded == 11) {
                 potions = [
-                    { image: magentaPotion, x: 660, y: 165, width: 92.65, height: magentaPotion.height, frame: 0 },
-                    { image: yellowPotion, x: 760, y: 165, width: 92.65, height: yellowPotion.height, frame: 0 },
-                    { image: cyanPotion, x: 860, y: 165, width: 92.65, height: cyanPotion.height, frame: 0 },
-                    { image: emptyBottle, x: 660, y: 315, width: 92.65, height: emptyBottle.height, frame: 0 },
-                    { image: emptyBottle, x: 760, y: 315, width: 92.65, height: emptyBottle.height, frame: 0 },
-                    { image: emptyBottle, x: 860, y: 315, width: 92.65, height: emptyBottle.height, frame: 0 }
+                    { image: magentaPotion, x: 660, y: 165, width: 92.65, height: magentaPotion.height, frame: 0, color: 'rgba(255, 0, 255, 1)' },
+                    { image: yellowPotion, x: 760, y: 165, width: 92.65, height: yellowPotion.height, frame: 0, color: 'rgba(255, 255, 0, 1)' },
+                    { image: cyanPotion, x: 860, y: 165, width: 92.65, height: cyanPotion.height, frame: 0, color: 'rgba(0, 255, 255, 1)' },
+                    { image: emptyBottle, x: 660, y: 315, width: 92.65, height: emptyBottle.height, frame: 0, color: 'transparent' },
+                    { image: emptyBottle, x: 760, y: 315, width: 92.65, height: emptyBottle.height, frame: 0, color: 'transparent' },
+                    { image: emptyBottle, x: 860, y: 315, width: 92.65, height: emptyBottle.height, frame: 0, color: 'transparent' }
                 ];
                 draw()
             }
         }
 
-        //FUNÇÃO PARA DESENHAR
+        // Função responsável pelo desenho do conteúdo do canvas
         function draw() {
+            animationCompleted = false;
+            animationInProgress = false;
+            gradientRadiusX = 0;
+            gradientRadiusY = 0;
             ctx.clearRect(0, 0, W, H);
             ctx.drawImage(bg, 0, 0);
             ctx.drawImage(cauldron, 200, 300, cauldron.width * 2.5, cauldron.height * 2.5);
 
             ctx.beginPath();
             ctx.ellipse(mixingEllipsis.x, mixingEllipsis.y, mixingEllipsis.radiusX, mixingEllipsis.radiusY, 0, 0, Math.PI * 2);
+            ctx.fillStyle = mixingEllipsis.color;
             ctx.fill();
 
             potions.forEach(potion => {
                 ctx.drawImage(potion.image, potion.frame * potion.width, 0, potion.width, potion.height, potion.x, potion.y, potion.width, potion.height);
             });
-            ctx.drawImage(overlay, 0, 0)
-            ctx.drawImage(btnBack, 840, 25, btnBack.width, btnBack.height)
-            ctx.drawImage(btnReset, 930, 20, btnReset.width * 0.35, btnReset.height * 0.35)
-
-
+            ctx.drawImage(overlay, 0, 0);
+            ctx.drawImage(btnBack, 840, 25, btnBack.width, btnBack.height);
+            ctx.drawImage(btnReset, 930, 20, btnReset.width * 0.35, btnReset.height * 0.35);
         }
 
-        //INSIDE
+        //  Função responsável por verificar colisões entre diferentes objectos
         function isInside(pos, rect) {
             return pos.x > rect.x && pos.x < rect.x + rect.width && pos.y < rect.y + rect.height && pos.y > rect.y;
         }
 
-        //RESET
+        //  Event listener dos botões de navegação (reset e voltar ao menu inicial, respetivamente)
         canvas.addEventListener('click', (e) => {
             const pos = {
                 x: e.clientX - canvas.offsetLeft,
                 y: e.clientY - canvas.offsetTop
             };
 
+            //  Verifica se o cursor está na área do botão de reset
             if (isInside(pos, { x: 930, y: 20, width: btnReset.width * 0.35, height: btnReset.height * 0.35 })) {
                 reset()
             }
+            //  Verifica se o cursor está na área do botão de voltar ao menu
             if (isInside(pos, { x: 840, y: 25, width: btnBack.width, height: btnBack.height })) {
                 reset();
                 window.location.href = 'index.html';
             }
         })
 
-        //VERIFICA COLISÃO
+        //  Função responsável pela colisão de uma poção com o caldeirão
         function checkCollision(potion, cauldron) {
             return (
                 potion.x < cauldron.x + cauldron.width &&
@@ -118,16 +129,16 @@
             );
         }
 
-
-        //MOUSE MOVE
+        //  Event listener que controla o comportamento do curso enquanto faz hover e quando pressiona objetos
         canvas.addEventListener('mousemove', (e) => {
-            const pos = {
+            let pos = {
                 x: e.clientX - canvas.offsetLeft,
                 y: e.clientY - canvas.offsetTop
             };
 
             let isClickable = false;
 
+            //  Muda o cursor de 'default' para 'pointer' para o utilizador saber que pode manipular as poções
             potions.forEach(potion => {
                 if (isInside(pos, potion)) {
                     document.body.style.cursor = 'pointer';
@@ -136,19 +147,24 @@
                 }
             });
 
+            //  Muda o cursor de 'default' para 'pointer' para o utilizador saber que pode carregar no botão de reset
             if (isInside(pos, { x: 930, y: 20, width: btnReset.width * 0.35, height: btnReset.height * 0.35 })) {
                 document.body.style.cursor = 'pointer';
                 isClickable = true;
             }
+
+            //  Muda o cursor de 'default' para 'pointer' para o utilizador saber que pode carregar no botão de voltar ao menu
             if (isInside(pos, { x: 840, y: 25, width: btnBack.width, height: btnBack.height })) {
                 document.body.style.cursor = 'pointer';
                 isClickable = true;
             }
 
+            //  Permite que o rato retorne à definição inicial quando não está em contacto com nenhum objeto clicável
             if (!isClickable) {
                 document.body.style.cursor = 'default';
             }
 
+            //  Condicional responsável pelo sprite das poções - muda o frame visível consoante a distância ao caldeirão
             if (selectedPotion !== null) {
                 document.body.style.cursor = 'pointer';
 
@@ -158,7 +174,6 @@
 
                 if (checkCollision(selectedPotion, { x: 270 + cauldron.width * 1.7 * 0.5, y: 250, width: cauldron.width * 1.7 * 0.125, height: 100 })) {
                     selectedPotion.frame = 5
-                    mixingPotions()
                 } else if (checkCollision(selectedPotion, { x: 270 + cauldron.width * 1.7 * 0.625, y: 250, width: cauldron.width * 1.7 * 0.125, height: 100 }) || checkCollision(selectedPotion, { x: 270 + cauldron.width * 1.7 * 0.375, y: 250, width: cauldron.width * 1.7 * 0.125, height: 100 })) {
                     selectedPotion.frame = 4
                 } else if (checkCollision(selectedPotion, { x: 270 + cauldron.width * 1.7 * 0.75, y: 250, width: cauldron.width * 1.7 * 0.125, height: 100 }) || checkCollision(selectedPotion, { x: 270 + cauldron.width * 1.7 * 0.25, y: 250, width: cauldron.width * 1.7 * 0.125, height: 100 })) {
@@ -173,9 +188,10 @@
             }
         });
 
-
-        //MOUSE DOWN
+        //  Event listener associado ao click sobre as poções
         canvas.addEventListener('mousedown', (e) => {
+            cancelAnimation = false;
+
             const pos = {
                 x: e.clientX - canvas.offsetLeft,
                 y: e.clientY - canvas.offsetTop
@@ -190,16 +206,15 @@
             });
         });
 
-        //MOUSE UP
+        //  Event listener que permite invocar a função responsável pela animação do líquido da poção dentro do caldeirão
         canvas.addEventListener('mouseup', (e) => {
-            if (mixingEllipsis.color == 'mediumpurple' && potions.find(potion => potion.image == purplePotion) == null) {
-                potions.find(potion => potion.image == emptyBottle).image = purplePotion
-            } else if (mixingEllipsis.color == 'orange' && potions.find(potion => potion.image == orangePotion) == null) {
-                potions.find(potion => potion.image == emptyBottle).image = orangePotion
-            } if (mixingEllipsis.color == 'green' && potions.find(potion => potion.image == greenPotion) == null) {
-                potions.find(potion => potion.image == emptyBottle).image = greenPotion
+            if (selectedPotion.frame == 5 && !animationCompleted && !animationInProgress && selectedPotion.color != 'transparent' && mixingEllipsis.color != 'rgba(255, 170, 0, 1)' && mixingEllipsis.color != 'rgba(170, 0, 255, 1)' && mixingEllipsis.color != 'rgba(0, 255, 0, 1)') {
+                potionColor = selectedPotion.color;
+                animationInProgress = true;
+                animate();
             }
 
+            //  Volta a colocar a poção na posição inicial quando o rato deixa de ser premido
             potions.forEach(function (potion, potionIndex) {
                 potion.frame = 0
                 if (potionIndex < 3) {
@@ -220,72 +235,93 @@
             selectedPotion = null;
         });
 
-        // MISTURA DE CORES
-        function mixingPotions() {
-            const gradient = ctx.createRadialGradient(mixingEllipsis.x, mixingEllipsis.y, 0, mixingEllipsis.x, mixingEllipsis.y, mixingEllipsis.radiusX / 3);
-
-            if (selectedPotion.frame === 5) {
-                if (mixingEllipsis.color === null) {
-                    if (selectedPotion.image === magentaPotion) {
-                        mixingEllipsis.color = 'magenta';
-                    }
-                    else if (selectedPotion.image === cyanPotion) {
-                        mixingEllipsis.color = 'cyan';
-                    }
-                    else if (selectedPotion.image === yellowPotion) {
-                        mixingEllipsis.color = 'yellow';
-                    }
-                    gradient.addColorStop(0, mixingEllipsis.color);
-                    gradient.addColorStop(1, 'black');
-                    ctx.fillStyle = gradient;
-                }
-
-                if (mixingEllipsis.color === 'magenta' && selectedPotion.image !== magentaPotion) {
-                    if (selectedPotion.image === cyanPotion) {
-                        mixingEllipsis.color = 'mediumpurple';
-                    } else if (selectedPotion.image === yellowPotion) {
-                        mixingEllipsis.color = 'orange';
-                    }
-                    gradient.addColorStop(0, mixingEllipsis.color);
-                    gradient.addColorStop(1, 'magenta');
-                    ctx.fillStyle = gradient;
-                }
-
-                if (mixingEllipsis.color === 'cyan' && selectedPotion.image !== cyanPotion) {
-                    if (selectedPotion.image === magentaPotion) {
-                        mixingEllipsis.color = 'mediumpurple';
-                    } else if (selectedPotion.image === yellowPotion) {
-                        mixingEllipsis.color = 'green';
-                    }
-                    gradient.addColorStop(0, mixingEllipsis.color);
-                    gradient.addColorStop(1, 'cyan');
-                    ctx.fillStyle = gradient;
-                }
-
-                if (mixingEllipsis.color === 'yellow' && selectedPotion.image !== yellowPotion) {
-                    if (selectedPotion.image === magentaPotion) {
-                        mixingEllipsis.color = 'orange';
-                    } else if (selectedPotion.image === cyanPotion) {
-                        mixingEllipsis.color = 'green';
-                    }
-                    gradient.addColorStop(0, mixingEllipsis.color);
-                    gradient.addColorStop(1, 'yellow');
-                    ctx.fillStyle = gradient;
-                }
-
-                draw();
+        //  Função responsável por colocar os resultados das combinações das poções nos respetivos frascos
+        function checkPotions() {
+            if (mixingEllipsis.color == 'rgba(170, 0, 255, 1)' && potions.find(potion => potion.image == purplePotion) == null) {
+                potions.find(potion => potion.image == emptyBottle).image = purplePotion;
+                potions.find(potion => potion.color == 'transparent').color = 'rgba(170, 0, 255, 1)';
+            } else if (mixingEllipsis.color == 'rgba(255, 170, 0, 1)' && potions.find(potion => potion.image == orangePotion) == null) {
+                potions.find(potion => potion.image == emptyBottle).image = orangePotion
+                potions.find(potion => potion.color == 'transparent').color = 'rgba(255, 170, 0, 1)';
+            } if (mixingEllipsis.color == 'rgba(0, 255, 0, 1)' && potions.find(potion => potion.image == greenPotion) == null) {
+                potions.find(potion => potion.image == emptyBottle).image = greenPotion
+                potions.find(potion => potion.color == 'transparent').color = 'rgba(0, 255, 0, 1)';
             }
         }
 
-        //RESET
-        function reset() {
-            ctx.reset()
-            mixingEllipsis.color = null;
-            draw();
+        //  Função responsável por gerar os gradientes dos líquidos contidos no caldeirão
+        function animate() {
+            //  Criação da elipse que vai conter os gradientes
+            ctx.save();
+            ctx.beginPath();
+            ctx.ellipse(mixingEllipsis.x, mixingEllipsis.y, mixingEllipsis.radiusX, mixingEllipsis.radiusY, 0, 0, 2 * Math.PI);
+            ctx.clip();
+
+            if (mixingEllipsis.color == 'rgba(255, 0, 255, 1)') {       //magenta
+                if (potionColor == 'rgba(255, 255, 0, 1)') {            //amarelo
+                    potionColor = 'rgba(255, 170, 0, 1)'                //laranja
+                } else if (potionColor == 'rgba(0, 255, 255, 1)') {     //ciano
+                    potionColor = 'rgba(170, 0, 255, 1)'                //roxo
+                }
+            } else if (mixingEllipsis.color == 'rgba(255, 255, 0, 1)') { //amarelo
+                if (potionColor == 'rgba(255, 0, 255, 1)') {            //magenta
+                    potionColor = 'rgba(255, 170, 0, 1)'                //laranja
+                } else if (potionColor == 'rgba(0, 255, 255, 1)') {     //ciano
+                    potionColor = 'rgba(0, 255, 0, 1)' //verde
+                }
+            } else if (mixingEllipsis.color == 'rgba(0, 255, 255, 1)') { //ciano
+                if (potionColor == 'rgba(255, 0, 255, 1)') {            //magenta
+                    potionColor = 'rgba(170, 0, 255, 1)'                //roxo
+                } else if (potionColor == 'rgba(255, 255, 0, 1)') {     //amarelo
+                    potionColor = 'rgba(0, 255, 0, 1)'                  //verde
+                }
+            }
+
+            //  Desenho do gradiente radial com as respetivas cores
+            let gradient = ctx.createRadialGradient(mixingEllipsis.x, mixingEllipsis.y, 0, mixingEllipsis.x, mixingEllipsis.y, gradientRadiusX, mixingEllipsis.y, gradientRadiusY);
+            gradient.addColorStop(0, potionColor);
+            gradient.addColorStop(1, mixingEllipsis.color);
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            //  Volta ao estado anterior para eliminar o clipping
+            ctx.restore();
+
+            //  Incremento dos raios (eixo do X e eixo do Y) do gradiente
+            gradientRadiusX += 3;
+            gradientRadiusY += 1;
+
+            //  Muda a cor consoante o incremento dos raios do gradiente
+            const maxColorValue = potionColor.substring(potionColor.indexOf('(')+1,potionColor.lastIndexOf(','))
+            const alpha = gradientRadiusX / canvas.width;
+            potionColor = `rgba(${maxColorValue}, ${1 - alpha})`;
+
+            //  Verifica se os raios do gradiente são superiores aos raios da elipse (eixo X e eixo Y). Se sim, assume que a animação está completa.
+            if (gradientRadiusX >= mixingEllipsis.radiusX+350 && gradientRadiusY >= mixingEllipsis.radiusY+150) {
+                animationInProgress = false;
+                animationCompleted = true;
+                mixingEllipsis.color = `rgba(${maxColorValue}, 1)`;
+                checkPotions();
+                draw();
+                return;
+            }
+
+            //  Cancela a animação
+            if (cancelAnimation) {
+                return;
+            }
+
+            //  Pede cada frame da animação
+            requestAnimationFrame(animate);
         }
 
+        //  Função responsável por dar reset ao canvas
+        function reset() {
+            cancelAnimation = true;
+            mixingEllipsis.color = 'rgba(40, 58, 81, 0)';
+            draw();
+        }
     </script>
-
 </body>
-
 </html>
